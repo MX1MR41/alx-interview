@@ -1,0 +1,2 @@
+- https://en.wikipedia.org/wiki/UTF-8
+- https://www.youtube.com/watch?v=MijmeoH9LT4
