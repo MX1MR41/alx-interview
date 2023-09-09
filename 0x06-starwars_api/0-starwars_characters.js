@@ -2,36 +2,35 @@
 const request = require('request');
 
 const movieId = process.argv[2];
+const baseUrl = 'https://swapi-api.alx-tools.com/api/films/';
+const fullUrl = baseUrl.concat(movieId);
 
-if (!movieId) {
-  console.log('Usage: /0-starwars_characters.js <MOVIE_ID>');
-  process.exit(1);
-}
-
-const url = `https://swapi-api.hbtn.io/api/films/${movieId}`;
-
-request(url, async function (error, response, body) {
-  if (error) console.log(error);
-  if (response.statusCode === 404) {
-    console.log('This movie ID does not exist');
-    process.exit(1);
-  }
-  const characters = JSON.parse(body).characters;
-  for (let i = 0; i < characters.length; i++) {
-    await getCharacterName(characters[i]).then((result) => {
-      console.log(result);
-    }).catch((error) => {
-      console.log(error);
+request(fullUrl, (error, response, body) => {
+  if (!error) {
+    const characters = JSON.parse(body).characters;
+    // Create a variable to store the number of characters processed
+    let charactersProcessed = 0;
+    // Create an empty array to store the character names
+    const characterNames = [];
+    characters.forEach((characterUrl) => {
+      request(characterUrl, (error, response, body) => {
+        if (!error) {
+          const charName = JSON.parse(body).name;
+          // Add the character name to the array
+          characterNames.push(charName);
+        }
+        // Increment the charactersProcessed variable
+        charactersProcessed++;
+        // Check if all characters have been processed
+        if (charactersProcessed === characters.length) {
+          // Log the character names when all characters have been processed
+          characterNames.forEach((actor) => {
+            console.log(actor);
+          });
+        }
+      });
     });
+  } else {
+    console.log(error);
   }
 });
-
-function getCharacterName (url) {
-  return new Promise((resolve, reject) => {
-    request(url, (error, response, body) => {
-      if (error) reject(error);
-      const character = JSON.parse(body).name;
-      resolve(character);
-    });
-  });
-}
